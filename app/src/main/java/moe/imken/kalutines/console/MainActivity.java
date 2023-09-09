@@ -1,3 +1,6 @@
+// Copyright (C) 2017 Chaquo Ltd. Licensed under MIT.
+// Copyright (C) 2023 Imken Luo <me@imken.moe>
+
 package moe.imken.kalutines.console;
 
 import android.app.*;

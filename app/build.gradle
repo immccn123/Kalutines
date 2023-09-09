@@ -8,10 +8,10 @@ android {
     defaultConfig {
         applicationId "moe.imken.kalutines"
         minSdkVersion 21
-        //noinspection ExpiredTargetSdkVersion,EditedTargetSdkVersion,EditedTargetSdkVersion
-        targetSdkVersion 21
+        //noinspection EditedTargetSdkVersion
+        targetSdkVersion 31
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.1"
         python {
             pip {
                 install "six"
@@ -19,7 +19,7 @@ android {
             }
         }
         ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            abiFilters "armeabi-v7a", "arm64-v8a"
         }
     }
 
@@ -34,6 +34,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'moe.imken.kalutines.console'
 }
 
 dependencies {
@@ -41,8 +42,4 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
-    testImplementation 'androidx.arch.core:core-testing:2.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
 }

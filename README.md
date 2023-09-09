@@ -4,4 +4,4 @@ A tool to auto complete the homework in [Onion School / 洋葱学园](https://ya
 
 ![](icon.png)
 
-(Kalutines-chan)
+(Kalutines-chan, original characters created by Imken)

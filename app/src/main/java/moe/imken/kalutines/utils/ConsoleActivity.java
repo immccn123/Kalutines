@@ -1,3 +1,4 @@
+// Copyright Chaquo Ltd. Licensed under MIT.
 package moe.imken.kalutines.utils;
 
 import androidx.annotation.NonNull;
