@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Generate App Bundle
+    name: Generate APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,9 +16,15 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: gradle
-      
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
       - name: Build APK in Release
-        run: ./gradlew bundleRelease
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v1
