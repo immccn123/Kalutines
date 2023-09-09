@@ -43,15 +43,6 @@ jobs:
         with:
           name: kalutines-test
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-
       - name: Sign APK
         id: sign_apk
         uses: r0adkll/sign-android-release@v1
@@ -63,14 +54,12 @@ jobs:
           keyPassword: ${{ secrets.SIGNING_ALIAS_PASSWORD }}
         env:
           BUILD_TOOLS_VERSION: "30.0.2"
-  
-      - name: Upload Release APK
+
+      - name: Copy Release Files
+        run: cp ${{ steps.sign_app.outputs.signedReleaseFile }} kalutines-${{ github.ref }}.apk
+
+      - name: Release
         id: upload_release_asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
-          asset_name: kalutines-${{ github.ref }}.apk
-          asset_content_type: application/zip
+          files: kalutines-${{ github.ref }}.apk
