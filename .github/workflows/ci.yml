@@ -17,6 +17,10 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
       - name: Build APK in Release
         run: |
           chmod +x ./gradlew
