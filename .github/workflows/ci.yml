@@ -16,9 +16,11 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: gradle
-      
+
       - name: Build APK in Release
-        run: ./gradlew bundleRelease
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bundleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v1
