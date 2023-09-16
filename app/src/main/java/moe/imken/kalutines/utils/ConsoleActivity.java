@@ -1,31 +1,30 @@
 // Copyright Chaquo Ltd. Licensed under MIT.
 package moe.imken.kalutines.utils;
 
-import androidx.annotation.NonNull;
-import android.app.*;
-import android.graphics.*;
-import android.os.*;
+import android.app.Application;
+import android.graphics.Typeface;
+import android.os.Build;
+import android.os.Bundle;
 import android.text.*;
-import android.text.style.*;
+import android.text.style.CharacterStyle;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.*;
-import android.view.inputmethod.*;
-import android.widget.*;
-import androidx.annotation.*;
-import androidx.appcompat.app.*;
-import androidx.core.content.*;
-import androidx.lifecycle.*;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProviders;
 
 public abstract class ConsoleActivity extends AppCompatActivity
 implements ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnScrollChangedListener {
-
-    // Because tvOutput has freezesText enabled, letting it get too large can cause a
-    // TransactionTooLargeException. The limit isn't in the saved state itself, but in the
-    // Binder transaction which transfers it to the system server. So it doesn't happen if
-    // you're rotating the screen, but it does happen when you press Back.
-    //
-    // The exception message shows the size of the failed transaction, so I can determine from
-    // experiment that the limit is about 500 KB, and each character consumes 4 bytes.
-    private final int MAX_SCROLLBACK_LEN = 100000;
 
     private EditText etInput;
     private ScrollView svOutput;
@@ -76,42 +75,37 @@ implements ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnScrollCha
         // At least on API level 28, if an ACTION_UP is lost during a rotation, then the app
         // (or any other app which takes focus) will receive an endless stream of ACTION_DOWNs
         // until the key is pressed again. So we react to ACTION_UP instead.
-        etInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE ||
+        etInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE ||
                     (event != null && event.getAction() == KeyEvent.ACTION_UP)) {
-                    String text = etInput.getText().toString() + "\n";
-                    etInput.setText("");
-                    output(span(text, new StyleSpan(Typeface.BOLD)));
-                    scrollTo(Scroll.BOTTOM);
-                    task.onInput(text);
-                }
-
-                // If we return false on ACTION_DOWN, we won't be given the ACTION_UP.
-                return true;
+                String text = etInput.getText().toString() + "\n";
+                etInput.setText("");
+                output(span(text, new StyleSpan(Typeface.BOLD)));
+                scrollTo(Scroll.BOTTOM);
+                task.onInput(text);
             }
+
+            // If we return false on ACTION_DOWN, we won't be given the ACTION_UP.
+            return true;
         });
 
-        task.inputEnabled.observe(this, new Observer<Boolean>() {
-            @Override public void onChanged(@Nullable Boolean enabled) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                if (enabled) {
-                    etInput.setVisibility(View.VISIBLE);
-                    etInput.setEnabled(true);
+        task.inputEnabled.observe(this, enabled -> {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (enabled) {
+                etInput.setVisibility(View.VISIBLE);
+                etInput.setEnabled(true);
 
-                    // requestFocus alone doesn't always bring up the soft keyboard during startup
-                    // on the Nexus 4 with API level 22: probably some race condition. (After
-                    // rotation with input *already* enabled, the focus may be overridden by
-                    // onRestoreInstanceState, which will run after this observer.)
-                    etInput.requestFocus();
-                    imm.showSoftInput(etInput, InputMethodManager.SHOW_IMPLICIT);
-                } else {
-                    // Disable rather than hide, otherwise tvOutput gets a gray background on API
-                    // level 26, like tvCaption in the main menu when you press an arrow key.
-                    etInput.setEnabled(false);
-                    imm.hideSoftInputFromWindow(tvOutput.getWindowToken(), 0);
-                }
+                // requestFocus alone doesn't always bring up the soft keyboard during startup
+                // on the Nexus 4 with API level 22: probably some race condition. (After
+                // rotation with input *already* enabled, the focus may be overridden by
+                // onRestoreInstanceState, which will run after this observer.)
+                etInput.requestFocus();
+                imm.showSoftInput(etInput, InputMethodManager.SHOW_IMPLICIT);
+            } else {
+                // Disable rather than hide, otherwise tvOutput gets a gray background on API
+                // level 26, like tvCaption in the main menu when you press an arrow key.
+                etInput.setEnabled(false);
+                imm.hideSoftInputFromWindow(tvOutput.getWindowToken(), 0);
             }
         });
     }
@@ -225,11 +219,7 @@ implements ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnScrollCha
         saveScroll();
 
         task.output.removeObservers(this);
-        task.output.observe(this, new Observer<CharSequence>() {
-            @Override public void onChanged(@Nullable CharSequence text) {
-                output(text);
-            }
-        });
+        task.output.observe(this, this::output);
     }
 
     private boolean isScrolledToBottom() {
@@ -280,6 +270,14 @@ implements ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnScrollCha
         }
 
         Editable scrollback = (Editable) tvOutput.getText();
+        // Because tvOutput has freezesText enabled, letting it get too large can cause a
+        // TransactionTooLargeException. The limit isn't in the saved state itself, but in the
+        // Binder transaction which transfers it to the system server. So it doesn't happen if
+        // you're rotating the screen, but it does happen when you press Back.
+        //
+        // The exception message shows the size of the failed transaction, so I can determine from
+        // experiment that the limit is about 500 KB, and each character consumes 4 bytes.
+        int MAX_SCROLLBACK_LEN = 100000;
         if (scrollback.length() > MAX_SCROLLBACK_LEN) {
             scrollback.delete(0, MAX_SCROLLBACK_LEN / 10);
         }

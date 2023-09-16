@@ -12,7 +12,7 @@ import java.util.*;
  * set. */
 public class BufferedLiveEvent<T> extends SingleLiveEvent<T> {
 
-    private ArrayList<T> mBuffer = new ArrayList<>();
+    private final ArrayList<T> mBuffer = new ArrayList<>();
     private Handler mHandler;
 
     /** Unlike in the base class, multiple calls to postData will always result in multiple values
@@ -22,11 +22,7 @@ public class BufferedLiveEvent<T> extends SingleLiveEvent<T> {
         if (mHandler == null) {
             mHandler = new Handler(Looper.getMainLooper());
         }
-        mHandler.post(new Runnable() {
-            @Override public void run() {
-                setValue(value);
-            }
-        });
+        mHandler.post(() -> setValue(value));
     }
 
     @Override public void setValue(@Nullable T t) {
@@ -39,8 +35,8 @@ public class BufferedLiveEvent<T> extends SingleLiveEvent<T> {
 
     @Override protected void onActive() {
         // Don't use a foreach loop, an observer might call setValue and lengthen the buffer.
-        for (int i = 0; i < mBuffer.size(); i++) {
-            super.setValue(mBuffer.get(i));
+        for (T t : mBuffer) {
+            super.setValue(t);
         }
         mBuffer.clear();
     }

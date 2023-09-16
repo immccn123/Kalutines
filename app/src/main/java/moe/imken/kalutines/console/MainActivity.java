@@ -4,6 +4,7 @@
 package moe.imken.kalutines.console;
 
 import android.app.*;
+import androidx.annotation.Keep;
 import moe.imken.kalutines.utils.PythonConsoleActivity;
 
 public class MainActivity extends PythonConsoleActivity {
@@ -18,6 +19,7 @@ public class MainActivity extends PythonConsoleActivity {
         return Task.class;
     }
 
+    @Keep
     public static class Task extends PythonConsoleActivity.Task {
         public Task(Application app) {
             super(app);

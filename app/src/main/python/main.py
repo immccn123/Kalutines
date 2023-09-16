@@ -1,4 +1,4 @@
-from six.moves import input
+# from six.moves import input
 
 from api import *
 
@@ -14,12 +14,9 @@ print(INTRO_S)
 
 
 def bug_report(msg, **kwargs):
-    print("\n\n\n")
-    print("Oops! 程序出现了一些问题：\n\t%s" % msg)
-    print("正在准备生成日志文件和调试信息，请稍后。")
+    print("程序出现了一些问题：\n\t%s" % msg)
     print(json.dumps(kwargs))
-    print("日志文件已生成，请复制⬆️")
-    print("请前往我们的GitHub仓库提出issue: https://github.com/immccn123/Yangcong-tools/issues/new/choose 。")
+    print("复制上述内容，请提出issue: https://github.com/immccn123/Yangcong-tools/issues 。")
     exit(3)
 
 

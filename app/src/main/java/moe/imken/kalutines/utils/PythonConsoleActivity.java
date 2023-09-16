@@ -15,7 +15,7 @@ import com.chaquo.python.*;
 /** Base class for a console-based activity that will run Python code. sys.stdout and sys.stderr
  * will be directed to the output view whenever the activity is resumed. If the Python code
  * caches their values, it can direct output to the activity even when it's paused.
- *
+ * <p>
  * Unless inputType is InputType.TYPE_NULL, `sys.stdin` will also be redirected whenever
  * the activity is resumed. The input box will initially be hidden, and will be displayed the
  * first time `sys.stdin` is read. */
@@ -54,11 +54,15 @@ public abstract class PythonConsoleActivity extends ConsoleActivity {
     public static abstract class Task extends ConsoleActivity.Task {
 
         protected Python py = Python.getInstance();
-        private PyObject console = py.getModule("chaquopy.utils.console");
-        private PyObject sys = py.getModule("sys");
+        private final PyObject console = py.getModule("chaquopy.utils.console");
+        private final PyObject sys = py.getModule("sys");
         int inputType;
-        private PyObject stdin, stdout, stderr;
-        private PyObject realStdin, realStdout, realStderr;
+        private PyObject stdin;
+        private final PyObject stdout;
+        private final PyObject stderr;
+        private PyObject realStdin;
+        private final PyObject realStdout;
+        private final PyObject realStderr;
 
         public Task(Application app) {
             this(app, InputType.TYPE_CLASS_TEXT);

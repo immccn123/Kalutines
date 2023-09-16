@@ -52,12 +52,9 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
         }
 
         mObserver = observer;
-        mObserverWrapper = new Observer<T>() {
-            @Override
-            public void onChanged(@Nullable T t) {
-                if (mPending.compareAndSet(true, false)) {
-                    mObserver.onChanged(t);
-                }
+        mObserverWrapper = t -> {
+            if (mPending.compareAndSet(true, false)) {
+                mObserver.onChanged(t);
             }
         };
         super.observe(owner, mObserverWrapper);

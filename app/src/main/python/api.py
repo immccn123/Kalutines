@@ -5,7 +5,7 @@
     This program is a part of Yangcong-tools. See `main.py` for more details.
 """
 
-import json
+from json import loads
 from random import randint
 
 import requests
@@ -61,7 +61,7 @@ def get_unfinished_homework():
     ctx = session.get(
         "https://school-api.yangcong345.com/student/ai-homework/all/unfinish",
     )
-    return json.loads(ctx.content.decode("utf-8"))
+    return loads(ctx.content.decode("utf-8"))
 
 
 def get_expired_homework():
@@ -70,7 +70,7 @@ def get_expired_homework():
     ctx = session.get(
         "https://school-api.yangcong345.com/student/ai-homework/all/expired",
     )
-    return json.loads(ctx.content.decode("utf-8"))
+    return loads(ctx.content.decode("utf-8"))
 
 
 def get_topic_detail(topic_id):
@@ -79,7 +79,7 @@ def get_topic_detail(topic_id):
     ctx = session.get(
         f"https://school-api.yangcong345.com/course/topics/{topic_id}/detail-universal",
     )
-    return json.loads(ctx.content.decode("utf-8"))
+    return loads(ctx.content.decode("utf-8"))
 
 
 def submit_video(topic_id, homework_id, video_id, duration):
@@ -133,18 +133,18 @@ def submit_video_problem(problem_id, homework_id, topic_id, answers):
 def get_task_problem(homework_id):
     if AUTH_TOKEN == "":
         return
-    uid = json.loads(
+    uid = loads(
         session.get(
             "https://school-api.yangcong345.com/user-auths/order/auth",
         ).content.decode("utf-8")
     )["userId"]
-    detail_id = json.loads(
+    detail_id = loads(
         session.post(
             f"https://school-api.yangcong345.com/student/tasks/{homework_id}/task-detail",
             json={"userId": uid},
         ).content.decode("utf-8")
     )["taskDetailId"]
-    return json.loads(
+    return loads(
         session.get(
             f"https://school-api.yangcong345.com/student/task-detail/{detail_id}/problems",
         ).content.decode("utf-8")
@@ -163,7 +163,7 @@ def commit_problem_progress(group_id, is_finished: bool, problems):
 def get_practice_problems(homework_id):
     if AUTH_TOKEN == "":
         return
-    return json.loads(
+    return loads(
         session.get(
             f"https://school-api.yangcong345.com/student/practices/{homework_id}",
         ).content.decode("utf-8")
@@ -195,7 +195,7 @@ def get_vacations():
         "https://school-api.yangcong345.com/vacation/student/homework/list",
     )
     ctx = ctx.content.decode("utf-8")
-    return json.loads(ctx)["vacations"]
+    return loads(ctx)["vacations"]
 
 
 def get_vacation_details(vacation_id):
@@ -206,7 +206,7 @@ def get_vacation_details(vacation_id):
         + f"?measuringID={vacation_id}",
         )
     ctx = ctx.content.decode("utf-8")
-    return json.loads(ctx)
+    return loads(ctx)
 
 
 def get_vacation_video_detail(topic_id, task_id):
@@ -216,7 +216,7 @@ def get_vacation_video_detail(topic_id, task_id):
         f"https://school-api.yangcong345.com/course/topics/{topic_id}/detail-video"
         + f"?taskID=f{task_id}"
     )
-    return json.loads(ctx.content.decode("utf-8"))
+    return loads(ctx.content.decode("utf-8"))
 
 
 def submit_vacation_video(topic_id, video_id, task_id, duration):
@@ -258,7 +258,7 @@ def submit_vacation_practice(
 def get_vacation_stage_problem(task_id, stage_id, subject_id, homework_id):
     if AUTH_TOKEN == "":
         return
-    return json.loads(
+    return loads(
         session.get(
             "https://school-api.yangcong345.com/vacation/student/homework/stage-practise"
             + f"?taskID={task_id}&stageId={stage_id}&subjectId={subject_id}&homeworkId={homework_id}"
